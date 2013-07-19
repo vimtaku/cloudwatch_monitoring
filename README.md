@@ -19,6 +19,7 @@ Requirements
 ## Platform:
 
 * Ubuntu/Debian
+* RHEL
 
 
 Attributes

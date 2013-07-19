@@ -21,12 +21,36 @@
 # limitations under the License.
 #
 
-%w{unzip libwww-perl libcrypt-ssleay-perl}.each do |p|
-  package p do
-    action :install
-  end
-end
 
+install_path="#{node[:cw_mon][:home_dir]}/aws-scripts-mon-v#{node[:cw_mon][:version]}"
+zip_filepath="#{node[:cw_mon][:home_dir]}/CloudWatchMonitoringScripts-v#{node[:cw_mon][:version]}.zip"
+
+case node[:platform_family]
+  when 'rhel'
+    %w{unzip perl-CPAN}.each do |p|
+      package p
+    end
+
+    %w{Test::More Bundle::LWP5_837 Bundle::LWP}.each do |m|
+      execute "install Perl module #{m}" do
+        command "perl -MCPAN -e 'install #{m}' < /dev/null"
+        not_if { ::File.directory?(install_path) }
+      end
+    end
+
+  when 'debian'
+
+    %w{unzip libwww-perl libcrypt-ssleay-perl}.each do |p|
+      package p do
+        action :install
+      end
+    end
+
+  else
+    log "#{node[:platform_family]} is not supported" do
+      level :warn
+    end
+end
 
 group node[:cw_mon][:group] do
   action :create
@@ -43,70 +67,67 @@ directory node[:cw_mon][:home_dir] do
   owner node[:cw_mon][:user]
 end
 
-install_path="#{node[:cw_mon][:home_dir]}/aws-scripts-mon-v#{node[:cw_mon][:version]}"
-zip_filepath="#{node[:cw_mon][:home_dir]}/CloudWatchMonitoringScripts-v#{node[:cw_mon][:version]}.zip"
 
 remote_file zip_filepath do
-  source "#{node[:cw_mon][:release_url]}"
-  owner "#{node[:cw_mon][:user]}"
-  group "#{node[:cw_mon][:group]}"
-  mode 0755 
+  source node[:cw_mon][:release_url]
+  owner node[:cw_mon][:user]
+  group node[:cw_mon][:group]
+  mode 0755
   not_if { File.directory? install_path }
 end
 
 
-
-bash "extract_aws-scripts-mon" do
-  user "#{node[:cw_mon][:user]}"
-  group "#{node[:cw_mon][:group]}"
+bash 'extract_aws-scripts-mon' do
+  user node[:cw_mon][:user]
+  group node[:cw_mon][:group]
   cwd ::File.dirname(zip_filepath)
   code <<-EOH
     rm -rf #{install_path}
     [[ -d #{File.dirname(install_path)} ]] || mkdir -vp #{File.dirname(install_path)}
     unzip #{zip_filepath}
     mv -v ./aws-scripts-mon #{install_path}
+    chown -R #{node[:cw_mon][:user]}:#{node[:cw_mon][:group]} #{install_path}
   EOH
   not_if { File.directory? install_path }
 end
 
 
 file zip_filepath do
-  action :delete    
+  action :delete
 end
 
-options = ["--from-cron"]
+options = ['--from-cron'] + node[:cw_mon][:options]
 
-iam_role = node[:ec2][:iam][:info][:InstanceProfileArn].to_s rescue ""
+iam_role = node[:ec2][:iam][:info][:InstanceProfileArn].to_s rescue ''
 if iam_role.empty?
   log "no IAM role available. CloudWatch Monitoring scripts will use IAM user #{node[:cw_mon][:user]}" do
     level :warn
   end
-  map = {}
+  vars = {}
   begin
     user_creds = Chef::EncryptedDataBagItem.load(node[:cw_mon][:aws_users_databag], node[:cw_mon][:user])
-    map[:access_key_id] = user_creds['access_key_id']
-    map[:secret_access_key] = user_creds['secret_access_key']
+    vars[:access_key_id] = user_creds['access_key_id']
+    vars[:secret_access_key] = user_creds['secret_access_key']
     log "AWS key for user #{ node[:cw_mon][:user]} found in databag #{node[:cw_mon][:aws_users_databag]}"
   rescue
-    map =node[:cw_mon]
+    vars =node[:cw_mon]
   end
 
   template "#{install_path}/awscreds.conf" do
-    owner "#{node[:cw_mon][:user]}"
-    group "#{node[:cw_mon][:group]}"
+    owner node[:cw_mon][:user]
+    group node[:cw_mon][:group]
     mode 0644
-    source "awscreds.conf.erb"
-    variables     :cw_mon => map
+    source 'awscreds.conf.erb'
+    variables :cw_mon => vars
   end
 
-  options << "--aws-credential-file #{node[:cw_mon][:home_dir]}/aws-scripts-mon/awscreds.conf"
+  options << "--aws-credential-file #{install_path}/aws-scripts-mon/awscreds.conf"
 else
   log "IAM role available: #{iam_role}"
 end
 
-
-cron_d "cloudwatch_monitoring" do
+cron_d 'cloudwatch_monitoring' do
   minute "*/5"
   user node[:cw_mon][:user]
-  command %Q{#{install_path}/mon-put-instance-data.pl #{(options+node[:cw_mon][:options]).join(' ')} || logger -t aws-scripts-mon "status=failed exit_code=$?"}
+  command %Q{#{install_path}/mon-put-instance-data.pl #{(options).join(' ')} || logger -t aws-scripts-mon "status=failed exit_code=$?"}
 end
