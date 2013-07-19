@@ -65,12 +65,6 @@ If the key get be loaded from the databag, the node attributes will be used.
 Make sure that the user associated to the key has permissions to perform the Amazon CloudWatch `PutMetricData` operation.
 
 
-
-Changes
-=======
-
-## v1.0.0:
-
 License and Author
 ==================
 

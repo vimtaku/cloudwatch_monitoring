@@ -12,6 +12,7 @@
     "centos": ">= 0.0.0"
   },
   "dependencies": {
+      "cron": ">= 0.0.0"
   },
   "recommendations": {
   },
