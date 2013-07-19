@@ -1,4 +1,4 @@
-cloudwatch-monitoring
+cloudwatch_monitoring
 ==========
 
 Install Amazon AWS Cloud Watch Monitoring Scripts
@@ -58,6 +58,7 @@ Make sure that the role has permissions to perform the Amazon CloudWatch `PutMet
 ### with a key
 
 If your instance does not have a role, you need to specify a key. This can be done in 2 ways:
+
 1. using the encrypted data bad specified by `node[:cw_mon][:aws_users_databag]`.  That bag must contain an item for `node[:cw_mon][:user]` with 2 attributes: `access_key_id` and `secret_access_key`
 2. using the node attributes: `node[:cw_mon][:secret_access_key]` and `node[:cw_mon][:secret_access_key]`
 
