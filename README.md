@@ -24,9 +24,6 @@ Requirements
 Attributes
 ==========
 
-* `node[:vim][:extra_packages]` - An array of extra packages related to vim to install (like plugins). Empty array by default.
-
-
 * `node[:cw_mon][:user]` - the user to run the script as. Created if necessary. Defaults to `cw_monitoring`.
 * `node[:cw_mon][:group]` - the group the files should belong to. Defaults to `cw_monitoring`.
 * `node[:cw_mon][:home_dir]` - the directory to install the scripts in. Defaults to  `/home/#{node[:cw_mon][:user]}`
