@@ -99,8 +99,7 @@ end
 
 options = ['--from-cron'] + node[:cw_mon][:options]
 
-iam_role = node[:ec2][:iam][:info][:InstanceProfileArn].to_s rescue ''
-if iam_role.empty?
+if IAM::role
   log "no IAM role available. CloudWatch Monitoring scripts will use IAM user #{node[:cw_mon][:user]}" do
     level :warn
   end
