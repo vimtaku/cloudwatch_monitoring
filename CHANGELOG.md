@@ -2,6 +2,9 @@
 
 This file is used to list changes made in each version of cloudwatch_monitoring.
 
+## 1.1.2:
+* fix credentials path. Thanks @(sepetov](https://github.com/sepetrov)
+
 ## 1.1.1:
 * add missing dependency on cron cookbook
 
