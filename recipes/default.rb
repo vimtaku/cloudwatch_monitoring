@@ -99,7 +99,9 @@ end
 
 options = ['--from-cron'] + node[:cw_mon][:options]
 
-if IAM::role
+if iam_role = IAM::role
+  log "IAM role available: #{iam_role}"
+else
   log "no IAM role available. CloudWatch Monitoring scripts will use IAM user #{node[:cw_mon][:user]}" do
     level :warn
   end
@@ -122,8 +124,6 @@ if IAM::role
   end
 
   options << "--aws-credential-file #{install_path}/awscreds.conf"
-else
-  log "IAM role available: #{iam_role}"
 end
 
 cron_d 'cloudwatch_monitoring' do
