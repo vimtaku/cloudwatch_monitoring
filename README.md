@@ -1,17 +1,7 @@
 cloudwatch_monitoring
 ==========
-
-Install Amazon AWS Cloud Watch Monitoring Scripts
-
-Cloudwatch_monitoring: The Amazon CloudWatch Monitoring Scripts for Linux are sample Perl scripts that
-demonstrate how to produce and consume Amazon CloudWatch custom metrics.
-
-The scripts comprise a fully functional example that reports memory, swap, and disk space utilization metrics
-for an Amazon Elastic Compute Cloud (Amazon EC2) Linux instance.
-
-
-http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/mon-scripts-perl.html
-
+Install Amazon AWS Cloud Watch Monitoring Scripts and Create Alart
+This script cloudwatch_monitoring is foked from https://github.com/alexism/cloudwatch_monitoring.
 
 Requirements
 ==========
@@ -20,7 +10,6 @@ Requirements
 
 * Ubuntu/Debian
 * RHEL
-
 
 Attributes
 ==========
@@ -37,12 +26,20 @@ Attributes
             `--disk-space-util  --disk-path=/ --disk-space-used --disk-space-avail`
              `--swap-util --swap-used --mem-util --mem-used --mem-avail`
 
+And you should read and setting these param
+ - node[:cw_mon][:cpuusage][...]
+ - node[:cw_mon][:diskusage][...]
+ - node[:cw_mon][:loadaverage][...]
+ - node[:cw_mon][:memusage][...]
 
 Usage
 =====
-
-Put `recipe[cloudwatch_monitoring]` in a run list, or `include_recipe 'cloud_watch_monitoring'` to ensure that
-the CloudWatch script is installed and cron'ed on your systems.
+Put these recipe to your run_list.
+ - recipe[cloudwatch_monitoring::cron]
+ - recipe[cloudwatch_monitoring::diskusage]
+ - recipe[cloudwatch_monitoring::cpuusage]
+ - recipe[cloudwatch_monitoring::memusage]
+ - recipe[cloudwatch_monitoring::loadaverage]
 
 ## AWS authentication
 
@@ -52,25 +49,16 @@ If your instance has an IAM role, then the script will use it to and you don't h
 
 Make sure that the role has permissions to perform the Amazon CloudWatch `PutMetricData` operation.
 
-
 ### with a key
-
-If your instance does not have a role, you need to specify a key. This can be done in 2 ways:
-
-1. using the encrypted data bad specified by `node[:cw_mon][:aws_users_databag]`.  That bag must contain an item for `node[:cw_mon][:user]` with 2 attributes: `access_key_id` and `secret_access_key`
-2. using the node attributes: `node[:cw_mon][:secret_access_key]` and `node[:cw_mon][:secret_access_key]`
-
-If the key get be loaded from the databag, the node attributes will be used.
-
-Make sure that the user associated to the key has permissions to perform the Amazon CloudWatch `PutMetricData` operation.
+(I'm sorry, I'm not testing this.)
 
 
 License and Author
 ==================
 
-Author:: Alexis Midon <alexismidon@gmail.com>
+Author:: vimtaku <vimtaku@gmail.com>
 
-Copyright 2013, Alexis Midon
+Copyright 2013, vimtaku
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

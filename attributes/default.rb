@@ -1,17 +1,23 @@
-
-
 default[:cw_mon][:user]              = "cw_monitoring"
 default[:cw_mon][:group]             = "cw_monitoring"
 default[:cw_mon][:home_dir]          = "/home/#{node[:cw_mon][:user]}"
-default[:cw_mon][:version]           = "1.1.0"
-default[:cw_mon][:release_url]       = "http://ec2-downloads.s3.amazonaws.com/cloudwatch-samples/CloudWatchMonitoringScripts-v1.1.0.zip"
+default[:cw_mon][:version]           = "1.3.0"
 
-
+default[:cw_mon][:use_iam_profile] = true
 default[:cw_mon][:aws_users_databag] = "aws_users"
 default[:cw_mon][:access_key_id]     = nil
 default[:cw_mon][:secret_access_key] = nil
 
-default[:cw_mon][:options] = %w{--disk-space-util  --disk-path=/ --disk-space-used
-                                --disk-space-avail --swap-util --swap-used
-                                --mem-util --mem-used --mem-avail}
+default[:cw_mon][:options] = %w{--disk-space-util --disk-path=/ --mem-util --load-average}
 
+default[:cw_mon][:install_path] = "#{default[:cw_mon][:home_dir]}/cloud_watch_script-v#{node[:cw_mon][:version]}"
+default[:cw_mon][:credential_path] ="#{default[:cw_mon][:home_dir]}/awscreds.conf"
+
+default[:cw_mon][:mon_script_git_repository] = "https://github.com/FumihikoSHIROYAMA/cloud_watch_script.git"
+default[:cw_mon][:mon_script_git_branch] = "master"
+
+default[:cw_mon][:region] = ""
+default[:cw_mon][:actions] = ""
+
+
+[Chef::Recipe, Chef::Resource].each { |l| l.send :include, ::Credential }

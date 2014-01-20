@@ -1,5 +1,4 @@
 
-
 module IAM
   def self.role
     require 'open-uri'
