@@ -3,22 +3,15 @@ require 'json'
 
 include_recipe "cloudwatch_monitoring::default"
 
-def ret_hash(name, value)
-  {"Name"=>name, "Value"=> value}
-end
-
 create_credential
 
-instance_id = (`curl -s http://169.254.169.254/latest/meta-data/instance-id`).strip rescue ""
+instance_id = get_instance_id
 filesystem  = (`df | grep -e '/$' | awk '{print $1}'`).strip rescue ""
 dimensions = []
-dimensions << ret_hash("InstanceId", instance_id)
-dimensions << ret_hash("Filesystem", filesystem)
-dimensions << ret_hash("MountPath", '/')
-hostname = (`hostname`).strip rescue ""
-alarm_name = sprintf("%s-%s-%s",
-  node[:cw_mon][:diskusage][:alarm_name_prefix], hostname, instance_id
-)
+dimensions << get_ret_hash("InstanceId", instance_id)
+dimensions << get_ret_hash("Filesystem", filesystem)
+dimensions << get_ret_hash("MountPath", '/')
+alarm_name = get_alarm_name(node[:cw_mon][:diskusage][:alarm_name_prefix])
 
 bash 'put_disk_usage_alarm_metric' do
   user node[:cw_mon][:user]

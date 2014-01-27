@@ -3,19 +3,12 @@ require 'json'
 
 include_recipe "cloudwatch_monitoring::default"
 
-def ret_hash(name, value)
-  {"Name"=>name, "Value"=> value}
-end
-
 create_credential
 
-instance_id = (`curl -s http://169.254.169.254/latest/meta-data/instance-id`).strip rescue ""
+instance_id = get_instance_id
 dimensions = []
-dimensions << ret_hash("InstanceId", instance_id)
-hostname = (`hostname`).strip rescue ""
-alarm_name = sprintf("%s-%s-%s",
-  node[:cw_mon][:loadaverage][:alarm_name_prefix], hostname, instance_id
-)
+dimensions << get_ret_hash("InstanceId", instance_id)
+alarm_name = get_alarm_name(node[:cw_mon][:loadaverage][:alarm_name_prefix])
 
 bash 'put_load_average_alarm_metric' do
   user node[:cw_mon][:user]

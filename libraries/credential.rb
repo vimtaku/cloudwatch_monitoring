@@ -12,6 +12,7 @@ module Credential
       return
     end
 
+
     vars = {}
     begin
       user_creds = Chef::EncryptedDataBagItem.load(node[:cw_mon][:aws_users_databag], node[:cw_mon][:user])
@@ -19,7 +20,7 @@ module Credential
       vars[:secret_access_key] = user_creds['secret_access_key']
       log "AWS key for user #{ node[:cw_mon][:user]} found in databag #{node[:cw_mon][:aws_users_databag]}"
     rescue
-      vars =node[:cw_mon]
+      vars = node[:cw_mon]
     end
 
     template credential_path do

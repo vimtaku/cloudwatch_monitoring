@@ -13,20 +13,8 @@ Requirements
 
 Attributes
 ==========
-
-* `node[:cw_mon][:user]` - the user to run the script as. Created if necessary. Defaults to `cw_monitoring`.
-* `node[:cw_mon][:group]` - the group the files should belong to. Defaults to `cw_monitoring`.
-* `node[:cw_mon][:home_dir]` - the directory to install the scripts in. Defaults to  `/home/#{node[:cw_mon][:user]}`
-* `node[:cw_mon][:version]`  - the version of the scripts to install. Defaults to `1.1.0`
-* `node[:cw_mon][:release_url]` - the URL to download from. Defaults to `http://ec2-downloads.s3.amazonaws.com/cloudwatch-samples/CloudWatchMonitoringScripts-v1.1.0.zip`
-* `node[:cw_mon][:aws_users_databag]` - the encrypted databag containing the AWS key. See section below for details. Defaults to `aws_users`
-* `node[:cw_mon][:access_key_id]`     - the AWS access key id the script should authenticate with. See section below for details.
-* `node[:cw_mon][:secret_access_key]` - the AWS access key the script should authenticate with. See section below for details.
-* `node[:cw_mon][:options]` - the list of options to pass to the script. By default, all options are included:
-            `--disk-space-util  --disk-path=/ --disk-space-used --disk-space-avail`
-             `--swap-util --swap-used --mem-util --mem-used --mem-avail`
-
-And you should read and setting these param
+you should read and setting these param
+ - node[:cw_mon][:default][...]
  - node[:cw_mon][:cpuusage][...]
  - node[:cw_mon][:diskusage][...]
  - node[:cw_mon][:loadaverage][...]
