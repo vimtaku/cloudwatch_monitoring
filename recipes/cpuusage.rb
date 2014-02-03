@@ -28,6 +28,7 @@ bash 'put_cpu_usage_alarm_metric' do
       --threshold  '#{node[:cw_mon][:cpuusage][:threshold]}'  \
       --evaluation-periods  '#{node[:cw_mon][:cpuusage][:evaluation_periods]}' \
       --comparison-operator '#{node[:cw_mon][:cpuusage][:comparison_operator]}' \
+      --insufficient-data-actions '#{node[:cw_mon]["actions"]}' \
       --dimensions '#{dimensions.to_json}'
   EOH
 end
